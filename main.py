@@ -1,22 +1,23 @@
 import sys
 
 import pygame
+import self
 from pygame import mixer
 from PIL import Image
 
 from Cell_status import Cell_status
-from config import left_side_arrow, right_side_arrow, player_score, yellow_cell_image, red_cell_image, maze
+from config import left_side_arrow, right_side_arrow, player_score, yellow_cell_image, red_cell_image, maze, black_cost
 from config import left_puzzle_image, right_puzzle_image, down_puzzle_image, up_puzzle_image, puzzle_position
-from config import GRAY, BLACK, character_image, player_x, player_y, teleport_image, CELL_SIZE
+from config import GRAY, BLACK, character_image, player_x, player_y, teleport_image, CELL_SIZE, yellow_cost, red_cost
 from config import rows, cols, WIDTH, HEIGHT, down_image, right_image, rightArrow_image, left_image, up_image
 
 # Initialize Pygame
 pygame.init()
 
 
-mixer.init()
-mixer.music.load("Nu - Man O To.mp3")
-mixer.music.play(-1)
+# mixer.init()
+# mixer.music.load("Nu - Man O To.mp3")
+# mixer.music.play(-1)
 
 
 class Character(pygame.sprite.Sprite):
@@ -45,9 +46,19 @@ class Character(pygame.sprite.Sprite):
                         pass  # Update logic for puzzles here
                     else:
                         pass
-                elif up_cs and up_cs.track < 3:
-                    self.player_x -= 1
-                    up_cs.track += 1
+                elif up_cs and up_cs.track != 3:
+                    if up_cs.track == 0:
+                        self.player_x -= 1
+                        up_cs.track += 1
+                        self.score -= black_cost
+                    elif up_cs.track == 1:
+                        self.player_x -= 1
+                        up_cs.track += 1
+                        self.score -= yellow_cost
+                    elif up_cs.track == 2:
+                        self.player_x -= 1
+                        up_cs.track += 1
+                        self.score -= red_cost
 
         if key[pygame.K_DOWN]:
             if self.player_x == 9 and self.player_y == 2:  # downside_teleport_position
@@ -60,9 +71,19 @@ class Character(pygame.sprite.Sprite):
                 if down_cs and (down_cs.up == 1 or cs.down == 1):
                     if down_cs.upPuzzle or cs.downPuzzle:
                         pass  # Update logic for puzzles here
-                elif down_cs and down_cs.track < 3:
-                    self.player_x += 1
-                    down_cs.track += 1
+                elif down_cs and down_cs.track != 3:
+                    if down_cs.track == 0:
+                        self.player_x += 1
+                        down_cs.track += 1
+                        self.score -= black_cost
+                    elif down_cs.track == 1:
+                        self.player_x += 1
+                        down_cs.track += 1
+                        self.score -= yellow_cost
+                    elif down_cs.track == 2:
+                        self.player_x += 1
+                        down_cs.track += 1
+                        self.score -= red_cost
 
         if key[pygame.K_LEFT]:
             if self.player_x == left_side_arrow[0] and self.player_y == left_side_arrow[1] + 1:  # bound-check
@@ -72,9 +93,19 @@ class Character(pygame.sprite.Sprite):
                 if left_cs and (left_cs.right == 1 or cs.left == 1):
                     if left_cs.rightPuzzle or cs.leftPuzzle:
                         pass  # Update logic for puzzles here
-                elif left_cs and left_cs.track < 3:
-                    self.player_y -= 1
-                    left_cs.track += 1
+                elif left_cs and left_cs.track != 3:
+                    if left_cs.track == 0:
+                        self.player_y -= 1
+                        left_cs.track += 1
+                        self.score -= black_cost
+                    elif left_cs.track == 1:
+                        self.player_y -= 1
+                        left_cs.track += 1
+                        self.score -= yellow_cost
+                    elif left_cs.track == 2:
+                        self.player_y -= 1
+                        left_cs.track += 1
+                        self.score -= red_cost
 
         if key[pygame.K_RIGHT]:
             right_cs = maze_status[self.player_x][self.player_y + 1] if self.player_y + 1 < len(
@@ -82,17 +113,24 @@ class Character(pygame.sprite.Sprite):
             if right_cs and (right_cs.left == 1 or cs.right == 1):
                 if right_cs.leftPuzzle or cs.rightPuzzle:
                     pass  # Update logic for puzzles here
-            elif right_cs and right_cs.track < 3:
-                self.player_y += 1
-                right_cs.track += 1
+            elif right_cs and right_cs.track != 3:
+                if right_cs.track == 0:
+                    self.player_y += 1
+                    right_cs.track += 1
+                    self.score -= black_cost
+                elif right_cs.track == 1:
+                    self.player_y += 1
+                    right_cs.track += 1
+                    self.score -= yellow_cost
+                elif right_cs.track == 2:
+                    self.player_y += 1
+                    right_cs.track += 1
+                    self.score -= red_cost
 
 
 # Create the screen
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("MAZE")
-
-
-
 
 maze = [[Cell_status(maze[i][j]) for j in range(cols)] for i in range(rows)]
 
@@ -164,6 +202,22 @@ def draw_maze(frame):
                 draw_image_in_cell(teleport_image, i, j)
 
 
+def display_score(score):
+    font = pygame.font.Font(None, 20)
+    text = f"player score: {score}"
+    text_surface = font.render(text, True, (255, 255, 0))
+    # Calculate cell position
+    x = 0
+    y = 1
+
+    cell_x = x * CELL_SIZE
+    cell_y = y * CELL_SIZE
+    # Center text within the cell
+    text_rect = text_surface.get_rect(center=(cell_y + CELL_SIZE // 2, cell_x + CELL_SIZE // 2))
+    # Blit text to the screen
+    screen.blit(text_surface, text_rect)
+
+
 player = Character(player_x, player_y)
 
 # Game loop
@@ -177,21 +231,19 @@ def draw_puzzle():
                 case 1:
                     draw_image_in_cell(left_puzzle_image, i, j)
                     maze[i][j].leftPuzzle = True
-                    maze[i][j-1].rightPuzzle = True
+                    maze[i][j - 1].rightPuzzle = True
                 case 2:
                     draw_image_in_cell(up_puzzle_image, i, j)
                     maze[i][j].upPuzzle = True
-                    maze[i-1][j].downPuzzle = True
+                    maze[i - 1][j].downPuzzle = True
                 case 3:
                     draw_image_in_cell(right_puzzle_image, i, j)
                     maze[i][j].rightPuzzle = True
-                    maze[i][j+1].leftPuzzle = True
+                    maze[i][j + 1].leftPuzzle = True
                 case 4:
                     draw_image_in_cell(down_puzzle_image, i, j)
                     maze[i][j].downPuzzle = True
-                    maze[i+1][j].upPuzzle = True
-
-
+                    maze[i + 1][j].upPuzzle = True
 
 
 while True:
@@ -206,8 +258,7 @@ while True:
 
     screen.fill(BLACK)
 
-
-    draw_grid()
+    # draw_grid()
 
     portalGif_index = (portalGif_index + 1) % len(portalGif_frames)
 
@@ -219,6 +270,8 @@ while True:
     draw_image_in_cell(rightArrow_image, right_side_arrow[0], right_side_arrow[1])
 
     draw_image_in_cell(character_image, player.__getitem__()[0], player.__getitem__()[1])
+
+    display_score(player.score)
 
     pygame.display.flip()
 

@@ -19,6 +19,13 @@ player_y = 1
 # player score
 player_score = 2000
 
+
+# cost of each cell in yellow,red and black
+black_cost = 10
+yellow_cost = 20
+red_cost = 30
+
+
 # Load wall images
 down_image = pygame.image.load("asset/down.png")
 up_image = pygame.image.load("asset/up.png")
