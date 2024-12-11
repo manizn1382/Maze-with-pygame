@@ -1,10 +1,11 @@
 import sys
 
 import pygame
+from pygame import mixer
 from PIL import Image
 
 from Cell_status import Cell_status
-from config import left_side_arrow, right_side_arrow
+from config import left_side_arrow, right_side_arrow, player_score, yellow_cell_image, red_cell_image
 from config import GRAY, BLACK, character_image, player_x, player_y, teleport_image, CELL_SIZE
 from config import rows, cols, WIDTH, HEIGHT, down_image, right_image, rightArrow_image, left_image, up_image
 
@@ -12,16 +13,23 @@ from config import rows, cols, WIDTH, HEIGHT, down_image, right_image, rightArro
 pygame.init()
 
 
+# mixer.init()
+# mixer.music.load("Nu - Man O To.mp3")
+# mixer.music.play(-1)
+
+
 class Character(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
         self.player_x = x
         self.player_y = y
+        self.score = player_score
 
     def __getitem__(self):
         return self.player_x, self.player_y
 
     def move(self, key, maze_status):
+
         cs = maze_status[self.player_x][self.player_y]
 
         if key[pygame.K_UP]:
@@ -30,14 +38,15 @@ class Character(pygame.sprite.Sprite):
                 self.player_x = 9
                 self.player_y = 2
             else:
-                up_cs = maze_status[self.player_x - 1][self.player_y] if self.player_x - 1 >= 0 else ''
-                if up_cs.down == 1 or cs.up == 1:
+                up_cs = maze_status[self.player_x - 1][self.player_y] if self.player_x - 1 >= 0 else None
+                if up_cs and (up_cs.down == 1 or cs.up == 1):
                     if up_cs.downPuzzle == 1 or cs.upPuzzle == 1:
                         pass  # Update logic for puzzles here
                     else:
                         pass
-                else:
-                    self.player_x = max(0, self.player_x - 1)
+                elif up_cs and up_cs.track < 3:
+                    self.player_x -= 1
+                    up_cs.track += 1
 
         if key[pygame.K_DOWN]:
             if self.player_x == 9 and self.player_y == 2:  # downside_teleport_position
@@ -45,32 +54,36 @@ class Character(pygame.sprite.Sprite):
                 self.player_x = 1
                 self.player_y = 7
             else:
-                down_cs = maze_status[self.player_x + 1][self.player_y] if self.player_x + 1 < len(maze_status) else ''
-                if down_cs.up == 1 or cs.down == 1:
+                down_cs = maze_status[self.player_x + 1][self.player_y] if self.player_x + 1 < len(
+                    maze_status) else None
+                if down_cs and (down_cs.up == 1 or cs.down == 1):
                     if down_cs.upPuzzle or cs.downPuzzle:
                         pass  # Update logic for puzzles here
-                else:
-                    self.player_x = min(len(maze_status) - 1, self.player_x + 1)
+                elif down_cs and down_cs.track < 3:
+                    self.player_x += 1
+                    down_cs.track += 1
 
         if key[pygame.K_LEFT]:
             if self.player_x == left_side_arrow[0] and self.player_y == left_side_arrow[1] + 1:  # bound-check
                 pass
             else:
-                left_cs = maze_status[self.player_x][self.player_y - 1] if self.player_y - 1 >= 0 else ''
-                if left_cs.right == 1 or cs.left == 1:
+                left_cs = maze_status[self.player_x][self.player_y - 1] if self.player_y - 1 >= 0 else None
+                if left_cs and (left_cs.right == 1 or cs.left == 1):
                     if left_cs.rightPuzzle or cs.leftPuzzle:
                         pass  # Update logic for puzzles here
-                else:
-                    self.player_y = max(0, self.player_y - 1)
+                elif left_cs and left_cs.track < 3:
+                    self.player_y -= 1
+                    left_cs.track += 1
 
         if key[pygame.K_RIGHT]:
             right_cs = maze_status[self.player_x][self.player_y + 1] if self.player_y + 1 < len(
-                maze_status[0]) else ''
-            if right_cs.left == 1 or cs.right == 1:
+                maze_status[0]) else None
+            if right_cs and (right_cs.left == 1 or cs.right == 1):
                 if right_cs.leftPuzzle or cs.rightPuzzle:
                     pass  # Update logic for puzzles here
-            else:
-                self.player_y = min(len(maze_status[0]) - 1, self.player_y + 1)
+            elif right_cs and right_cs.track < 3:
+                self.player_y += 1
+                right_cs.track += 1
 
 
 # Create the screen
@@ -103,7 +116,8 @@ cells_info = [
      "0000000"],
 ]
 
-maze = [[0 for _ in range(cols)] for _ in range(rows)]
+# maze = [[0 for _ in range(cols)] for _ in range(rows)]
+maze = [[Cell_status(cells_info[i][j]) for j in range(cols)] for i in range(rows)]
 
 
 # Load GIF frames
@@ -151,24 +165,28 @@ def draw_image_in_cell(im, row, column):
     screen.blit(im, (x, y))
 
 
-def draw_maze(grid, frame):
+def draw_maze(frame):
     """Draws the static maze grid."""
     for i in range(rows):
         for j in range(cols):
-            cs = Cell_status(grid[i][j])
-            if cs.right == 1:
+            # cs = Cell_status(grid[i][j])
+            if maze[i][j].track == 2:
+                draw_image_in_cell(yellow_cell_image, i, j)
+            if maze[i][j].track == 3:
+                draw_image_in_cell(red_cell_image, i, j)
+            if maze[i][j].right == 1:
                 draw_image_in_cell(right_image, i, j)
-            if cs.left == 1:
+            if maze[i][j].left == 1:
                 draw_image_in_cell(left_image, i, j)
-            if cs.up == 1:
+            if maze[i][j].up == 1:
                 draw_image_in_cell(up_image, i, j)
-            if cs.down == 1:
+            if maze[i][j].down == 1:
                 draw_image_in_cell(down_image, i, j)
-            if cs.portal == 1:
+            if maze[i][j].portal == 1:
                 draw_image_in_cell(portalGif_frames[frame], i, j)
-            if cs.teleport == 1:
+            if maze[i][j].teleport == 1:
                 draw_image_in_cell(teleport_image, i, j)
-            maze[i][j] = cs
+            # maze[i][j] = cs
 
 
 player = Character(player_x, player_y)
@@ -184,13 +202,14 @@ while True:
     keys = pygame.key.get_pressed()
     player.move(keys, maze)
 
+
     screen.fill(BLACK)
 
     draw_grid()
 
     portalGif_index = (portalGif_index + 1) % len(portalGif_frames)
 
-    draw_maze(cells_info, portalGif_index)
+    draw_maze(portalGif_index)
 
     draw_image_in_cell(rightArrow_image, left_side_arrow[0], left_side_arrow[1])
     draw_image_in_cell(rightArrow_image, right_side_arrow[0], right_side_arrow[1])

@@ -16,6 +16,9 @@ GRAY = (200, 200, 200)
 player_x = 5
 player_y = 1
 
+# player score
+player_score = 2000
+
 # Load wall images
 down_image = pygame.image.load("asset/down.png")
 up_image = pygame.image.load("asset/up.png")
@@ -24,6 +27,8 @@ right_image = pygame.image.load("asset/right.png")
 character_image = pygame.image.load("asset/character.png")
 rightArrow_image = pygame.image.load("asset/right-arrow.png")
 teleport_image = pygame.image.load("asset/teleport.png")
+red_cell_image = pygame.image.load("asset/red_cell.png")
+yellow_cell_image = pygame.image.load("asset/yellow_cell.png")
 
 # Scale images to fit in a grid cell
 down_image = pygame.transform.scale(down_image, (CELL_SIZE, CELL_SIZE))
@@ -33,6 +38,8 @@ right_image = pygame.transform.scale(right_image, (CELL_SIZE, CELL_SIZE))
 character_image = pygame.transform.scale(character_image, (CELL_SIZE, CELL_SIZE))
 rightArrow_image = pygame.transform.scale(rightArrow_image, (CELL_SIZE, CELL_SIZE))
 teleport_image = pygame.transform.scale(teleport_image, (CELL_SIZE, CELL_SIZE))
+red_cell_image = pygame.transform.scale(red_cell_image, (CELL_SIZE, CELL_SIZE))
+yellow_cell_image = pygame.transform.scale(yellow_cell_image, (CELL_SIZE, CELL_SIZE))
 
 rows, cols = 11, 11
 

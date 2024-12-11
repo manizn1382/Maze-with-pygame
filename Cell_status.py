@@ -10,3 +10,5 @@ class Cell_status:
         self.rightPuzzle = False
         self.upPuzzle = False
         self.downPuzzle = False
+        self.track = 0
+
