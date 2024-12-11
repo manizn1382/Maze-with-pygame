@@ -26,6 +26,7 @@ class Character(pygame.sprite.Sprite):
 
         if key[pygame.K_UP]:
             if self.player_x == 1 and self.player_y == 7:  # upside_teleport_position
+                # place player in downside teleport
                 self.player_x = 9
                 self.player_y = 2
             else:
@@ -40,6 +41,7 @@ class Character(pygame.sprite.Sprite):
 
         if key[pygame.K_DOWN]:
             if self.player_x == 9 and self.player_y == 2:  # downside_teleport_position
+                # place player in upside teleport
                 self.player_x = 1
                 self.player_y = 7
             else:
@@ -51,12 +53,15 @@ class Character(pygame.sprite.Sprite):
                     self.player_x = min(len(maze_status) - 1, self.player_x + 1)
 
         if key[pygame.K_LEFT]:
-            left_cs = maze_status[self.player_x][self.player_y - 1] if self.player_y - 1 >= 0 else ''
-            if left_cs.right == 1 or cs.left == 1:
-                if left_cs.rightPuzzle or cs.leftPuzzle:
-                    pass  # Update logic for puzzles here
+            if self.player_x == left_side_arrow[0] and self.player_y == left_side_arrow[1] + 1:  # bound-check
+                pass
             else:
-                self.player_y = max(0, self.player_y - 1)
+                left_cs = maze_status[self.player_x][self.player_y - 1] if self.player_y - 1 >= 0 else ''
+                if left_cs.right == 1 or cs.left == 1:
+                    if left_cs.rightPuzzle or cs.leftPuzzle:
+                        pass  # Update logic for puzzles here
+                else:
+                    self.player_y = max(0, self.player_y - 1)
 
         if key[pygame.K_RIGHT]:
             right_cs = maze_status[self.player_x][self.player_y + 1] if self.player_y + 1 < len(
