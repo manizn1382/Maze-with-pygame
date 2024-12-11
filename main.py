@@ -5,7 +5,8 @@ from pygame import mixer
 from PIL import Image
 
 from Cell_status import Cell_status
-from config import left_side_arrow, right_side_arrow, player_score, yellow_cell_image, red_cell_image
+from config import left_side_arrow, right_side_arrow, player_score, yellow_cell_image, red_cell_image, maze
+from config import left_puzzle_image, right_puzzle_image, down_puzzle_image, up_puzzle_image, puzzle_position
 from config import GRAY, BLACK, character_image, player_x, player_y, teleport_image, CELL_SIZE
 from config import rows, cols, WIDTH, HEIGHT, down_image, right_image, rightArrow_image, left_image, up_image
 
@@ -13,9 +14,9 @@ from config import rows, cols, WIDTH, HEIGHT, down_image, right_image, rightArro
 pygame.init()
 
 
-# mixer.init()
-# mixer.music.load("Nu - Man O To.mp3")
-# mixer.music.play(-1)
+mixer.init()
+mixer.music.load("Nu - Man O To.mp3")
+mixer.music.play(-1)
 
 
 class Character(pygame.sprite.Sprite):
@@ -90,34 +91,10 @@ class Character(pygame.sprite.Sprite):
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("MAZE")
 
-# right, left, up, down, teleport, portal, mist(1 for exist & 0 for not-exist)
-cells_info = [
-    ["0000000", "0000000", "0000000", "0000000", "0000000", "0000000", "0000000", "0000100", "0000000", "0000000",
-     "0000000"],
-    ["0000000", "0110000", "0011000", "1011000", "0011010", "0111000", "1010000", "0000000", "0111000", "1010000",
-     "0000000"],
-    ["0000000", "0100000", "0100000", "0000000", "0000000", "0000000", "1101000", "0000000", "0000000", "1000000",
-     "0000000"],
-    ["0000000", "0101000", "0101000", "0110000", "1011000", "0000000", "1001000", "0001000", "0110000", "1010000",
-     "0000000"],
-    ["0000000", "0100000", "0100000", "0100000", "0101000", "0001000", "0100000", "0001000", "0001000", "1001000",
-     "0000000"],
-    ["0000000", "0000000", "0000000", "0100000", "0100000", "0101000", "0100000", "0000000", "0000000", "0000000",
-     "0000000"],
-    ["0000000", "0100000", "0100000", "0100000", "0101000", "0101000", "0001000", "1010010", "1001000", "1010000",
-     "0000000"],
-    ["0000000", "0100000", "0101000", "0101000", "0001000", "0000000", "0100000", "1001000", "0000000", "1000000",
-     "0000000"],
-    ["0000000", "0100000", "0101000", "0001000", "0001000", "0001000", "0001000", "1001000", "0000000", "1000000",
-     "0000000"],
-    ["0000000", "0101000", "0000000", "0101000", "0001000", "0001000", "0001000", "0001000", "0001000", "1001000",
-     "0000000"],
-    ["0000000", "0000000", "0000100", "0000000", "0000000", "0000000", "0000000", "0000000", "0000000", "0000000",
-     "0000000"],
-]
 
-# maze = [[0 for _ in range(cols)] for _ in range(rows)]
-maze = [[Cell_status(cells_info[i][j]) for j in range(cols)] for i in range(rows)]
+
+
+maze = [[Cell_status(maze[i][j]) for j in range(cols)] for i in range(rows)]
 
 
 # Load GIF frames
@@ -169,7 +146,6 @@ def draw_maze(frame):
     """Draws the static maze grid."""
     for i in range(rows):
         for j in range(cols):
-            # cs = Cell_status(grid[i][j])
             if maze[i][j].track == 2:
                 draw_image_in_cell(yellow_cell_image, i, j)
             if maze[i][j].track == 3:
@@ -186,13 +162,38 @@ def draw_maze(frame):
                 draw_image_in_cell(portalGif_frames[frame], i, j)
             if maze[i][j].teleport == 1:
                 draw_image_in_cell(teleport_image, i, j)
-            # maze[i][j] = cs
 
 
 player = Character(player_x, player_y)
 
 # Game loop
 clock = pygame.time.Clock()
+
+
+def draw_puzzle():
+    for i in range(rows):
+        for j in range(cols):
+            match puzzle_position[i][j]:
+                case 1:
+                    draw_image_in_cell(left_puzzle_image, i, j)
+                    maze[i][j].leftPuzzle = True
+                    maze[i][j-1].rightPuzzle = True
+                case 2:
+                    draw_image_in_cell(up_puzzle_image, i, j)
+                    maze[i][j].upPuzzle = True
+                    maze[i-1][j].downPuzzle = True
+                case 3:
+                    draw_image_in_cell(right_puzzle_image, i, j)
+                    maze[i][j].rightPuzzle = True
+                    maze[i][j+1].leftPuzzle = True
+                case 4:
+                    draw_image_in_cell(down_puzzle_image, i, j)
+                    maze[i][j].downPuzzle = True
+                    maze[i+1][j].upPuzzle = True
+
+
+
+
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -200,10 +201,11 @@ while True:
             sys.exit()
 
     keys = pygame.key.get_pressed()
+
     player.move(keys, maze)
 
-
     screen.fill(BLACK)
+
 
     draw_grid()
 
@@ -211,13 +213,13 @@ while True:
 
     draw_maze(portalGif_index)
 
+    draw_puzzle()
+
     draw_image_in_cell(rightArrow_image, left_side_arrow[0], left_side_arrow[1])
     draw_image_in_cell(rightArrow_image, right_side_arrow[0], right_side_arrow[1])
 
     draw_image_in_cell(character_image, player.__getitem__()[0], player.__getitem__()[1])
 
-    # Update the display
     pygame.display.flip()
 
-    # Control the frame rate for the GIF animation (e.g., 10 FPS)
     clock.tick(10)

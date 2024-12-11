@@ -29,6 +29,10 @@ rightArrow_image = pygame.image.load("asset/right-arrow.png")
 teleport_image = pygame.image.load("asset/teleport.png")
 red_cell_image = pygame.image.load("asset/red_cell.png")
 yellow_cell_image = pygame.image.load("asset/yellow_cell.png")
+down_puzzle_image = pygame.image.load("asset/down_puzzle.png")
+up_puzzle_image = pygame.image.load("asset/up_puzzle.png")
+left_puzzle_image = pygame.image.load("asset/left_puzzle.png")
+right_puzzle_image = pygame.image.load("asset/right_puzzle.png")
 
 # Scale images to fit in a grid cell
 down_image = pygame.transform.scale(down_image, (CELL_SIZE, CELL_SIZE))
@@ -40,9 +44,54 @@ rightArrow_image = pygame.transform.scale(rightArrow_image, (CELL_SIZE, CELL_SIZ
 teleport_image = pygame.transform.scale(teleport_image, (CELL_SIZE, CELL_SIZE))
 red_cell_image = pygame.transform.scale(red_cell_image, (CELL_SIZE, CELL_SIZE))
 yellow_cell_image = pygame.transform.scale(yellow_cell_image, (CELL_SIZE, CELL_SIZE))
+down_puzzle_image = pygame.transform.scale(down_puzzle_image, (CELL_SIZE, CELL_SIZE))
+up_puzzle_image = pygame.transform.scale(up_puzzle_image, (CELL_SIZE, CELL_SIZE))
+left_puzzle_image = pygame.transform.scale(left_puzzle_image, (CELL_SIZE, CELL_SIZE))
+right_puzzle_image = pygame.transform.scale(right_puzzle_image, (CELL_SIZE, CELL_SIZE))
+
 
 rows, cols = 11, 11
 
 # arrow_position
 left_side_arrow = (5, 0)
 right_side_arrow = (5, 10)
+
+# right, left, up, down, teleport, portal, mist(1 for exist & 0 for not-exist)
+maze = [
+    ["0000000", "0000000", "0000000", "0000000", "0000000", "0000000", "0000000", "0000100", "0000000", "0000000",
+     "0000000"],
+    ["0000000", "0110000", "0011000", "1011000", "0011010", "0111000", "1010000", "0000000", "0111000", "1010000",
+     "0000000"],
+    ["0000000", "0100000", "0100000", "0000000", "0000000", "0000000", "1101000", "0000000", "0000000", "1000000",
+     "0000000"],
+    ["0000000", "0101000", "0101000", "0110000", "1011000", "0000000", "1001000", "0001000", "0110000", "1010000",
+     "0000000"],
+    ["0000000", "0100000", "0100000", "0100000", "0101000", "0001000", "0100000", "0001000", "0001000", "1001000",
+     "0000000"],
+    ["0000000", "0000000", "0000000", "0100000", "0100000", "0101000", "0100000", "0000000", "0000000", "0000000",
+     "0000000"],
+    ["0000000", "0100000", "0100000", "0100000", "0101000", "0101000", "0001000", "1010010", "1001000", "1010000",
+     "0000000"],
+    ["0000000", "0100000", "0101000", "0101000", "0001000", "0000000", "0100000", "1001000", "0000000", "1000000",
+     "0000000"],
+    ["0000000", "0100000", "0101000", "0001000", "0001000", "0001000", "0001000", "1001000", "0000000", "1000000",
+     "0000000"],
+    ["0000000", "0101000", "0000000", "0101000", "0001000", "0001000", "0001000", "0001000", "0001000", "1001000",
+     "0000000"],
+    ["0000000", "0000000", "0000100", "0000000", "0000000", "0000000", "0000000", "0000000", "0000000", "0000000",
+     "0000000"],
+]
+
+puzzle_position = [
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 4, 0, 0, 0, 0, 4, 0, 0, 0],
+    [0, 0, 0, 0, 4, 0, 1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+]
