@@ -1,31 +1,15 @@
-
-
-import pygame
 import sys
 
-import self
+import pygame
 from PIL import Image
+
 from Cell_status import Cell_status
+from config import left_side_arrow, right_side_arrow
+from config import GRAY, BLACK, character_image, player_x, player_y, teleport_image, CELL_SIZE
+from config import rows, cols, WIDTH, HEIGHT, down_image, right_image, rightArrow_image, left_image, up_image
 
 # Initialize Pygame
 pygame.init()
-
-# Screen dimensions
-WIDTH, HEIGHT = 550, 550  # Screen width and height
-CELL_SIZE = 50  # Size of each grid cell
-
-# Calculate the number of rows and columns
-COLUMNS = WIDTH // CELL_SIZE
-ROWS = HEIGHT // CELL_SIZE
-
-# Colors
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-GRAY = (200, 200, 200)
-
-# player_pos
-player_x = 5
-player_y = 1
 
 
 class Character(pygame.sprite.Sprite):
@@ -41,22 +25,30 @@ class Character(pygame.sprite.Sprite):
         cs = maze_status[self.player_x][self.player_y]
 
         if key[pygame.K_UP]:
-            up_cs = maze_status[self.player_x - 1][self.player_y] if self.player_x - 1 >= 0 else ''
-            if up_cs.down == 1 or cs.up == 1:
-                if up_cs.downPuzzle == 1 or cs.upPuzzle == 1:
-                    pass  # Update logic for puzzles here
-                else:
-                    pass
+            if self.player_x == 1 and self.player_y == 7:  # upside_teleport_position
+                self.player_x = 9
+                self.player_y = 2
             else:
-                self.player_x = max(0, self.player_x - 1)
+                up_cs = maze_status[self.player_x - 1][self.player_y] if self.player_x - 1 >= 0 else ''
+                if up_cs.down == 1 or cs.up == 1:
+                    if up_cs.downPuzzle == 1 or cs.upPuzzle == 1:
+                        pass  # Update logic for puzzles here
+                    else:
+                        pass
+                else:
+                    self.player_x = max(0, self.player_x - 1)
 
         if key[pygame.K_DOWN]:
-            down_cs = maze_status[self.player_x + 1][self.player_y] if self.player_x + 1 < len(maze_status) else ''
-            if down_cs.up == 1 or cs.down == 1:
-                if down_cs.upPuzzle or cs.downPuzzle:
-                    pass  # Update logic for puzzles here
+            if self.player_x == 9 and self.player_y == 2:  # downside_teleport_position
+                self.player_x = 1
+                self.player_y = 7
             else:
-                self.player_x = min(len(maze_status) - 1, self.player_x + 1)
+                down_cs = maze_status[self.player_x + 1][self.player_y] if self.player_x + 1 < len(maze_status) else ''
+                if down_cs.up == 1 or cs.down == 1:
+                    if down_cs.upPuzzle or cs.downPuzzle:
+                        pass  # Update logic for puzzles here
+                else:
+                    self.player_x = min(len(maze_status) - 1, self.player_x + 1)
 
         if key[pygame.K_LEFT]:
             left_cs = maze_status[self.player_x][self.player_y - 1] if self.player_y - 1 >= 0 else ''
@@ -80,27 +72,9 @@ class Character(pygame.sprite.Sprite):
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("MAZE")
 
-# Load wall images
-down_image = pygame.image.load("asset/down.png")
-up_image = pygame.image.load("asset/up.png")
-left_image = pygame.image.load("asset/left.png")
-right_image = pygame.image.load("asset/right.png")
-character_image = pygame.image.load("asset/character.png")
-rightArrow_image = pygame.image.load("asset/right-arrow.png")
-
-# Scale images to fit in a grid cell
-down_image = pygame.transform.scale(down_image, (CELL_SIZE, CELL_SIZE))
-up_image = pygame.transform.scale(up_image, (CELL_SIZE, CELL_SIZE))
-left_image = pygame.transform.scale(left_image, (CELL_SIZE, CELL_SIZE))
-right_image = pygame.transform.scale(right_image, (CELL_SIZE, CELL_SIZE))
-character_image = pygame.transform.scale(character_image, (CELL_SIZE, CELL_SIZE))
-rightArrow_image = pygame.transform.scale(rightArrow_image, (CELL_SIZE, CELL_SIZE))
-
-rows, cols = 11, 11
-
 # right, left, up, down, teleport, portal, mist(1 for exist & 0 for not-exist)
 cells_info = [
-    ["0000000", "0000000", "0000000", "0000000", "0000000", "0000000", "0000000", "0000000", "0000000", "0000000",
+    ["0000000", "0000000", "0000000", "0000000", "0000000", "0000000", "0000000", "0000100", "0000000", "0000000",
      "0000000"],
     ["0000000", "0110000", "0011000", "1011000", "0011010", "0111000", "1010000", "0000000", "0111000", "1010000",
      "0000000"],
@@ -120,7 +94,7 @@ cells_info = [
      "0000000"],
     ["0000000", "0101000", "0000000", "0101000", "0001000", "0001000", "0001000", "0001000", "0001000", "1001000",
      "0000000"],
-    ["0000000", "0000000", "0000000", "0000000", "0000000", "0000000", "0000000", "0000000", "0000000", "0000000",
+    ["0000000", "0000000", "0000100", "0000000", "0000000", "0000000", "0000000", "0000000", "0000000", "0000000",
      "0000000"],
 ]
 
@@ -187,6 +161,8 @@ def draw_maze(grid, frame):
                 draw_image_in_cell(down_image, i, j)
             if cs.portal == 1:
                 draw_image_in_cell(portalGif_frames[frame], i, j)
+            if cs.teleport == 1:
+                draw_image_in_cell(teleport_image, i, j)
             maze[i][j] = cs
 
 
@@ -200,7 +176,6 @@ while True:
             pygame.quit()
             sys.exit()
 
-
     keys = pygame.key.get_pressed()
     player.move(keys, maze)
 
@@ -212,8 +187,8 @@ while True:
 
     draw_maze(cells_info, portalGif_index)
 
-    draw_image_in_cell(rightArrow_image, 5, 0)
-    draw_image_in_cell(rightArrow_image, 5, 10)
+    draw_image_in_cell(rightArrow_image, left_side_arrow[0], left_side_arrow[1])
+    draw_image_in_cell(rightArrow_image, right_side_arrow[0], right_side_arrow[1])
 
     draw_image_in_cell(character_image, player.__getitem__()[0], player.__getitem__()[1])
 
