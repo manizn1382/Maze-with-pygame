@@ -13,8 +13,8 @@ BLACK = (0, 0, 0)
 GRAY = (200, 200, 200)
 
 # player_pos
-player_x = 5
-player_y = 1
+player_x = 8
+player_y = 5
 
 # player score
 player_score = 2000
@@ -40,6 +40,9 @@ down_puzzle_image = pygame.image.load("asset/down_puzzle.png")
 up_puzzle_image = pygame.image.load("asset/up_puzzle.png")
 left_puzzle_image = pygame.image.load("asset/left_puzzle.png")
 right_puzzle_image = pygame.image.load("asset/right_puzzle.png")
+mist_image = pygame.image.load("asset/mist.png")
+
+
 
 # Scale images to fit in a grid cell
 down_image = pygame.transform.scale(down_image, (CELL_SIZE, CELL_SIZE))
@@ -55,6 +58,7 @@ down_puzzle_image = pygame.transform.scale(down_puzzle_image, (CELL_SIZE, CELL_S
 up_puzzle_image = pygame.transform.scale(up_puzzle_image, (CELL_SIZE, CELL_SIZE))
 left_puzzle_image = pygame.transform.scale(left_puzzle_image, (CELL_SIZE, CELL_SIZE))
 right_puzzle_image = pygame.transform.scale(right_puzzle_image, (CELL_SIZE, CELL_SIZE))
+mist_image = pygame.transform.scale(mist_image, (CELL_SIZE, CELL_SIZE))
 
 
 rows, cols = 11, 11
@@ -62,6 +66,10 @@ rows, cols = 11, 11
 # arrow_position
 left_side_arrow = (5, 0)
 right_side_arrow = (5, 10)
+
+# win_position
+win_pos = (5, 10)
+
 
 # right, left, up, down, teleport, portal, mist(1 for exist & 0 for not-exist)
 maze = [
@@ -75,13 +83,13 @@ maze = [
      "0000000"],
     ["0000000", "0100000", "0100000", "0100000", "0101000", "0001000", "0100000", "0001000", "0001000", "1001000",
      "0000000"],
-    ["0000000", "0000000", "0000000", "0100000", "0100000", "0101000", "0100000", "0000000", "0000000", "0000000",
+    ["0000000", "0000000", "0000000", "0100000", "0100000", "0101000", "0100001", "0000001", "0000000", "0000000",
      "0000000"],
-    ["0000000", "0100000", "0100000", "0100000", "0101000", "0101000", "0001000", "1010010", "1001000", "1010000",
+    ["0000000", "0100000", "0100000", "0100000", "0101000", "0101000", "0001001", "1010011", "1001000", "1010000",
      "0000000"],
-    ["0000000", "0100000", "0101000", "0101000", "0001000", "0000000", "0100000", "1001000", "0000000", "1000000",
+    ["0000000", "0100000", "0101000", "0101000", "0001000", "0000000", "0100001", "1001001", "0000000", "1000000",
      "0000000"],
-    ["0000000", "0100000", "0101000", "0001000", "0001000", "0001000", "0001000", "1001000", "0000000", "1000000",
+    ["0000000", "0100000", "0101000", "0001000", "0001000", "0001000", "0001001", "1001001", "0000000", "1000000",
      "0000000"],
     ["0000000", "0101000", "0000000", "0101000", "0001000", "0001000", "0001000", "0001000", "0001000", "1001000",
      "0000000"],
@@ -91,7 +99,7 @@ maze = [
 
 puzzle_position = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 4, 0, 0, 0, 0, 4, 0, 0, 0],
     [0, 0, 0, 0, 4, 0, 1, 0, 0, 0, 0],
