@@ -8,13 +8,17 @@ CELL_SIZE = 50  # Size of each grid cell
 COLUMNS = WIDTH // CELL_SIZE
 ROWS = HEIGHT // CELL_SIZE
 
+# matchstick_dim
+stick_x = 10
+stick_y = 80
+
 # Colors
 BLACK = (0, 0, 0)
 GRAY = (200, 200, 200)
 
 # player_pos
-player_x = 8
-player_y = 5
+player_x = 5
+player_y = 1
 
 # player score
 player_score = 2000
@@ -41,6 +45,10 @@ up_puzzle_image = pygame.image.load("asset/up_puzzle.png")
 left_puzzle_image = pygame.image.load("asset/left_puzzle.png")
 right_puzzle_image = pygame.image.load("asset/right_puzzle.png")
 mist_image = pygame.image.load("asset/mist.png")
+down_stick_image = pygame.image.load("asset/down_stick.png")
+up_stick_image = pygame.image.load("asset/up_stick.png")
+left_stick_image = pygame.image.load("asset/left_stick.png")
+right_stick_image = pygame.image.load("asset/right_stick.png")
 
 
 
@@ -59,6 +67,11 @@ up_puzzle_image = pygame.transform.scale(up_puzzle_image, (CELL_SIZE, CELL_SIZE)
 left_puzzle_image = pygame.transform.scale(left_puzzle_image, (CELL_SIZE, CELL_SIZE))
 right_puzzle_image = pygame.transform.scale(right_puzzle_image, (CELL_SIZE, CELL_SIZE))
 mist_image = pygame.transform.scale(mist_image, (CELL_SIZE, CELL_SIZE))
+
+right_stick_image = pygame.transform.scale(right_stick_image, (stick_y, stick_x))
+up_stick_image = pygame.transform.scale(up_stick_image, (stick_x, stick_y))
+down_stick_image = pygame.transform.scale(down_stick_image, (stick_x, stick_y))
+left_stick_image = pygame.transform.scale(left_stick_image, (stick_y, stick_x))
 
 
 rows, cols = 11, 11
